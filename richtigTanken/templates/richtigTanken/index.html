@@ -43,7 +43,22 @@
 
     <script type="text/template" id="mapTemplate">
       <div id="map"></div>
-      <div id="overlay"></div>
+      <div id="overlay" class="container hide">
+        <div class="row">
+           <div class="col s10 offset-s2">
+             <div class="card blue-grey darken-1">
+               <div class="card-content white-text">
+                 <span class="card-title">Neue Route wählen?</span>
+                 <p>Du sparst dabei <span id="overlay-euro-value">2</span>&euro; und hast <span id="overlay-minutes-value">4</span> Minuten Umweg.</p>
+               </div>
+               <div class="card-action right-align">
+                 <a href="#" onclick="routeToGasstation();">Ja</a>
+                 <a href='#' onclick="hideOverlay();">Nein</a>
+               </div>
+             </div>
+           </div>
+         </div>
+      </div>
     </script>
     <!-- templates end -->
     <script type="text/javascript" charset="utf-8" src= "http://maps.googleapis.com/maps/api/js?key=AIzaSyBdMmiyzeMJYYQlPd5Kk9MyHf-FSqRYagQ&sensor=true"></script>

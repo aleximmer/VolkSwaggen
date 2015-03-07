@@ -29,3 +29,17 @@
   text-align: center;
   padding-top: 100px;
 }
+
+#overlay {
+  z-index: 1000;
+  position: absolute;
+  top: 50px;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
