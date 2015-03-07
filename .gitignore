@@ -1,3 +1,4 @@
 *.pyo
 *.pyc
 /*/**.pyc
+db.sqlite3
