@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 # allgemiene Daten (ueber tankstellen-api zu holen)
 class Tankstellen(models.Model):
 	bezeichnung = models.CharField(max_length=256)
-	x_wert = models.IntegerField()
-	y_wert = models.IntegerField()
+	position_x = models.DecimalField(max_digits = 8, decimal_places = 6)
+	position_y = models.DecimalField(max_digits = 8, decimal_places = 6)
 
 # preise werden auch gecrawled (ebenfalls tankstellen-api)
 class BenzinPreis(models.Model):
