@@ -101,15 +101,16 @@ function getUser() {
 }
 
 function sendShit() {
-  $.ajax("/richtigTanken/", {
-    type: "POST",
-    "dataType": "json",
-    data: {
-      position: {
-        lat: 53.2322323,
-        lng: 54.2323423
-      }
+  var value = {
+        "x": "53.2322323",
+        "y": "54.2323423",
+        "verbrauch": "0.23"
     }
+  $.ajax("/richtigTanken/newValue/", {
+    type: "POST",
+    dataType: 'json',
+    contentType: 'application/json, charset=utf-8',
+    data: JSON.stringify(value)
   }).done(function(data) {
     console.log(data);
   })
