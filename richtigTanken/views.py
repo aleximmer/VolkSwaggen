@@ -7,6 +7,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import render
 
 
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
