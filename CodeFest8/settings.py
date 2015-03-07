@@ -1,5 +1,5 @@
 """
-Django settings for Volkswaggen project.
+Django settings for CodeFest8 project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '0d((yoi@+)6v(#6soo(aa&f(g@34y5e_i-p1s!$09ykjth8z91'
+SECRET_KEY = 'v57q*oh-8vy&-t(us3wf#c$afj%se_5s3e4hjaw-l_m-xrzvp+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -36,6 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'richtigTanken',
+    'rest_framework'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -48,9 +50,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'Volkswaggen.urls'
+ROOT_URLCONF = 'CodeFest8.urls'
 
-WSGI_APPLICATION = 'Volkswaggen.wsgi.application'
+WSGI_APPLICATION = 'CodeFest8.wsgi.application'
 
 
 # Database
@@ -81,3 +83,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
