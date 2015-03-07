@@ -54,10 +54,10 @@ def addWaypoint(request):
 def getGasStations(request):
     stations = {
         'stations': [
-            { 'lat': 52.50198, 'lng': 13.409852 },
-            { 'lat': 52.50178, 'lng': 13.409832 },
-            { 'lat': 52.50148, 'lng': 13.409842 },
-            { 'lat': 52.50195, 'lng': 13.409882 },
+            { 'lat': 52.53398, 'lng': 13.409852 },
+            { 'lat': 52.50178, 'lng': 13.404832 },
+            { 'lat': 52.50048, 'lng': 13.409842 },
+            { 'lat': 52.50195, 'lng': 13.406882 },
         ]
     }
     response = JsonResponse(stations, safe=False)

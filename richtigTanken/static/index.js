@@ -1,6 +1,16 @@
 var homeTemplate = $("#homeTemplate").html();
 var mapTemplate = $("#mapTemplate").html();
 
+var mapDfd;
+var stationsDfd;
+var markers = [];
+
+var position = {
+  lat: 52.502230,
+  lng: 13.413197
+};
+var selectedStation;
+
 /* Circle Stuff*/
 var notificationCircleColor = "green";
 
@@ -38,7 +48,39 @@ function showMap(data) {
     ],
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
+
+  mapDfd = new $.Deferred();
+  stationsDfd = new $.Deferred();
+
   var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+  google.maps.event.addListener(map, 'tilesloaded', function() {
+    mapDfd.resolve();
+  });
+
+  getGasStations();
+
+  $.when(mapDfd, stationsDfd).done(function() {
+    hideSpinner();
+  });
+
+  stationsDfd.done(function(data) {
+    _.each(data.stations, function(station) {
+      var latLng = new google.maps.LatLng(station.lat, station.lng);
+      var marker = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        curser: "pointer",
+        click: function() {
+          console.log("marker clicked");
+        }
+      });
+      google.maps.event.addListener(marker, 'click', function() {
+        selectedStation = station;
+        showOverlay(2,2);
+      });
+    });
+  });
 }
 
 function showTemplate(template, data) {
@@ -82,17 +124,30 @@ function changeCircleCount(count) {
 function showOverlay(saving, delay) {
   $("#overlay-euro-value").text(saving);
   $("#overlay-minutes-value").text(delay);
-  // $("#overlay").removeClass("hide").addClass("show");
   $("#overlay").show();
 }
 
 function hideOverlay() {
-  // $("#overlay").removeClass("show").addClass("hide");
   $("#overlay").hide();
 }
 
+function showSpinner() {
+  $("#spinner-wrapper").show();
+}
+
+function hideSpinner() {
+  $("#spinner-wrapper").hide();
+}
+
+function getGasStations() {
+  $.get("/richtigTanken/gasStations").done(function(data) {
+    stationsDfd.resolve(data);
+  });
+}
+
 function routeToGasStation() {
-  var url = "http://maps.google.com/maps?" + "saddr=52.502230,13.413197" + "&daddr=52.50198,13.409852";
+  // var url = "http://maps.google.com/maps?" + "saddr=52.502230,13.413197" + "&daddr=52.50198,13.409852";
+  var url = "http://maps.google.com/maps?" + "saddr=" + position.lat + "," + position.lng + "&daddr=" + selectedStation.lat + ","+ selectedStation.lng;
   window.location.replace(url);
 }
 
