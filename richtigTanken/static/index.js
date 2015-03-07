@@ -10,6 +10,17 @@ function showHome(data) {
 
 function showMap(data) {
   showTemplate(mapTemplate, data);
+
+  var mapOptions = {
+    center: new google.maps.LatLng(52.502230, 13.413197),
+    zoom: 13,
+    mapTypeControl: false,
+    panControl: false,
+    streetViewControl: false,
+    zoomControl: false,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 }
 
 function showTemplate(template, data) {
@@ -48,4 +59,10 @@ function changeCircleMessage(text) {
 function changeCircleCount(count) {
   var $circleCount = $("#circle-count");
   $circleCount.text(count);
+}
+
+function getUser() {
+  $.ajax("localhost:8000/users").done(function(data) {
+    console.log(data);
+  });
 }

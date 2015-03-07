@@ -5,7 +5,12 @@
   width: 100%;
 }
 
-#content {
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+#home {
   margin-top: 20px;
 }
 
