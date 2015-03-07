@@ -6,6 +6,9 @@ from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+import json
+from models import UserPositions
+import datetime
 
 
 
@@ -37,5 +40,10 @@ def index(request):
 
 @require_http_methods(["POST",])
 def addWaypoint(request):
-    print(request.body)
-    return render(request, 'richtigTanken/basic.html')
+    json_data = json.loads(request.body)
+    x = json_data['x']
+    y = json_data['y']
+    verbrauch = json_data['verbrauch']
+    neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
+    neuerWert.save()
+    return HttpResponse("OK")

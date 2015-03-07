@@ -29,7 +29,7 @@ class FahrtDaten(models.Model):
 
 # create user positions for mockup, updated jede minute
 class UserPositions(models.Model):
-	zeit = models.DateTimeField(auto_now = True)
+	zeit = models.DateTimeField()
 	benzin_delta_in_l = models.DecimalField(max_digits = 4, decimal_places = 2)
 	position_x = models.DecimalField(max_digits = 8, decimal_places = 6)
 	position_y = models.DecimalField(max_digits = 8, decimal_places = 6)
