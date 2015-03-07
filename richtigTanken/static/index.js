@@ -82,14 +82,16 @@ function changeCircleCount(count) {
 function showOverlay(saving, delay) {
   $("#overlay-euro-value").text(saving);
   $("#overlay-minutes-value").text(delay);
-  $("#overlay").removeClass("hide").addClass("show");
+  // $("#overlay").removeClass("hide").addClass("show");
+  $("#overlay").show();
 }
 
 function hideOverlay() {
-  $("#overlay").removeClass("show").addClass("hide");
+  // $("#overlay").removeClass("show").addClass("hide");
+  $("#overlay").hide();
 }
 
-function routeToGasstation() {
+function routeToGasStation() {
   var url = "http://maps.google.com/maps?" + "saddr=52.502230,13.413197" + "&daddr=52.50198,13.409852";
   window.location.replace(url);
 }

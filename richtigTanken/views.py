@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from richtigTanken.serializers import UserSerializer, GroupSerializer, FahrtDatenSerializer, UserPositionsSerializer #hieranders
 from models import FahrtDaten, UserPositions
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.template import RequestContext, loader
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -38,7 +39,7 @@ class UserPositionsViewSet(viewsets.ModelViewSet):
 def index(request):
     return render(request, 'richtigTanken/index.html')
 
-@require_http_methods(["POST",])
+@require_http_methods(["POST"])
 def addWaypoint(request):
     json_data = json.loads(request.body)
     x = json_data['x']
@@ -47,3 +48,15 @@ def addWaypoint(request):
     neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
     neuerWert.save()
     return HttpResponse("OK")
+
+def getGasStations(request):
+    stations = {
+        'stations': [
+            { 'lat': 52.50198, 'lng': 13.409852 },
+            { 'lat': 52.50178, 'lng': 13.409832 },
+            { 'lat': 52.50148, 'lng': 13.409842 },
+            { 'lat': 52.50195, 'lng': 13.409882 },
+        ]
+    }
+    response = JsonResponse(stations, safe=False)
+    return response
