@@ -79,6 +79,21 @@ function changeCircleCount(count) {
   $circleCount.text(count);
 }
 
+function showOverlay(saving, delay) {
+  $("#overlay-euro-value").text(saving);
+  $("#overlay-minutes-value").text(delay);
+  $("#overlay").removeClass("hide").addClass("show");
+}
+
+function hideOverlay() {
+  $("#overlay").removeClass("show").addClass("hide");
+}
+
+function routeToGasstation() {
+  var url = "http://maps.google.com/maps?" + "saddr=52.502230,13.413197" + "&daddr=52.50198,13.409852";
+  window.location.replace(url);
+}
+
 function getUser() {
   $.ajax("/users").done(function(data) {
     console.log(data);
