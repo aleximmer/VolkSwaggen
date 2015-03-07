@@ -30,7 +30,5 @@ class UserPositionsViewSet(viewsets.ModelViewSet):
     serializer_class = UserPositionsSerializer
 
 
-
-
 def index(request):
     return render(request, 'richtigTanken/index.html')
