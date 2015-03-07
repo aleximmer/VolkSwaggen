@@ -145,6 +145,12 @@ function getGasStations() {
   });
 }
 
+function getAllGasStations() {
+  $.get("/richtigTanken/allGasStations").done(function(data) {
+    stationsDfd.resolve(data);
+  });
+}
+
 function routeToGasStation() {
   // var url = "http://maps.google.com/maps?" + "saddr=52.502230,13.413197" + "&daddr=52.50198,13.409852";
   var url = "http://maps.google.com/maps?" + "saddr=" + position.lat + "," + position.lng + "&daddr=" + selectedStation.lat + ","+ selectedStation.lng;
@@ -157,12 +163,12 @@ function getUser() {
   });
 }
 
-function sendShit() {
-  var value = {
-        "x": "53.2322323",
-        "y": "54.2323423",
-        "verbrauch": "0.23"
-    }
+function sendWaypoint(waypoint) {
+  // var value = {
+  //       "x": "53.2322323",
+  //       "y": "54.2323423",
+  //       "verbrauch": "0.23"
+  //   }
   $.ajax("/richtigTanken/newValue/", {
     type: "POST",
     dataType: 'json',
@@ -174,8 +180,7 @@ function sendShit() {
 }
 
 function endRoute() {
-  $.ajax("/richtigTanken/endRoute/", {
-    type: "POST",
+  $.post("/richtigTanken/endRoute/", {
     dataType: 'text',
     data: "nothing"
   }).done(function(data) {
