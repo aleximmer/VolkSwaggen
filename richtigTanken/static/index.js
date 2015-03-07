@@ -14,10 +14,28 @@ function showMap(data) {
   var mapOptions = {
     center: new google.maps.LatLng(52.502230, 13.413197),
     zoom: 13,
+    draggable: false,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
     mapTypeControl: false,
     panControl: false,
     streetViewControl: false,
     zoomControl: false,
+    styles: [
+      {
+        'featureType': 'poi',
+        'elementType': 'labels',
+        'stylers': [
+          { 'visibility': 'off' }
+        ]
+      },
+      {
+        'featureType': 'administrative.province',
+        'stylers': [
+          { 'weight': 3.7 }
+        ]
+      }
+    ],
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
   var map = new google.maps.Map(document.getElementById("map"), mapOptions);

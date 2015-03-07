@@ -3,7 +3,7 @@
 <html>
   <head>
     <title>Swagger</title>
-    <link rel="stylesheet" href= "{%static 'bower_components/bootstrap/dist/css/bootstrap.css' %}">
+    <!-- <link rel="stylesheet" href= "{%static 'bower_components/bootstrap/dist/css/bootstrap.css' %}"> -->
     <link rel="stylesheet" href= "{%static 'bower_components/materialize/dist/css/materialize.css' %}">
     <link rel="stylesheet" href= "{%static 'main.css' %}">
 
@@ -29,13 +29,13 @@
         </div>
         <div class="row">
           <div class="col s2 offset-s3">
-            <span class="btn-floating btn-large waves-effect waves-light green" id="show-more" onclick="showMap();"><i class="mdi-action-done"></i></span>
+            <span class="btn-floating btn-large waves-effect waves-light green left-align" id="show-more" onclick="showMap();"><i class="mdi-action-done"></i></span>
           </div>
           <div class="col s2">
             Details anzeigen
           </div>
           <div class="col s2">
-            <span class="btn-floating btn-large waves-effect waves-light red pull-right" id="abort"><i class="mdi-content-clear"></i></span>
+            <span class="btn-floating btn-large waves-effect waves-light red right-align" id="abort"><i class="mdi-content-clear"></i></span>
           </div>
         </div>
       </div>
@@ -43,6 +43,7 @@
 
     <script type="text/template" id="mapTemplate">
       <div id="map"></div>
+      <div id="overlay"></div>
     </script>
     <!-- templates end -->
     <script type="text/javascript" charset="utf-8" src= "http://maps.googleapis.com/maps/api/js?key=AIzaSyBdMmiyzeMJYYQlPd5Kk9MyHf-FSqRYagQ&sensor=true"></script>
