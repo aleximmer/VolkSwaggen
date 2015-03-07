@@ -1,0 +1,26 @@
+#main {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+}
+
+#content {
+  margin-top: 20px;
+}
+
+#notification-circle {
+  width: 240px;
+  /* padding-bottom: 100%; */
+  height: 240px;
+  display: block;
+}
+
+#show-more, #abort {
+  text-align: center;
+}
+
+.circle-text-container {
+  text-align: center;
+  padding-top: 100px;
+}
