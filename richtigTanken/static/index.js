@@ -68,8 +68,9 @@ function getUser() {
 }
 
 function sendShit() {
-  $.ajax("/richtigTanken", {
+  $.ajax("/richtigTanken/", {
     type: "POST",
+    "dataType": "json",
     data: {
       position: {
         lat: 53.2322323,

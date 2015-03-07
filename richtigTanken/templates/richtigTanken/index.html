@@ -1,5 +1,5 @@
 {% load staticfiles %}
-
+{% csrf_token %}
 <html>
   <head>
     <title>Swagger</title>
@@ -29,7 +29,7 @@
         </div>
         <div class="row">
           <div class="col s2 offset-s3">
-            <span class="btn-floating btn-large waves-effect waves-light green" id="show-more"><i class="mdi-action-done"></i></span>
+            <span class="btn-floating btn-large waves-effect waves-light green" id="show-more" onclick="showMap();"><i class="mdi-action-done"></i></span>
           </div>
           <div class="col s2">
             Details anzeigen
@@ -49,6 +49,7 @@
     <script type="text/javascript" charset="utf-8" src= "{%static 'bower_components/jquery/dist/jquery.js' %}"></script>
     <script type="text/javascript" charset="utf-8" src= "{%static 'bower_components/materialize/dist/js/materialize.js' %}"></script>
     <script type="text/javascript" charset="utf-8" src= "{%static 'bower_components/lodash/lodash.js' %}"></script>
+    <script type="text/javascript" charset="utf-8" src= "{%static 'csrfHelper.js' %}"></script>
     <script type="text/javascript" charset="utf-8" src= "{%static 'index.js' %}"></script>
   </body>
 </html>
