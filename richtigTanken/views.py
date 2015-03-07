@@ -5,6 +5,7 @@ from models import FahrtDaten, UserPositions
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
 
 
 
@@ -34,5 +35,7 @@ class UserPositionsViewSet(viewsets.ModelViewSet):
 def index(request):
     return render(request, 'richtigTanken/index.html')
 
-def addWaypoint(request, x_value, y_value):
-    return render(request, 'richtigTanken/index.html')
+@require_http_methods(["POST",])
+def addWaypoint(request):
+    print(request.body)
+    return render(request, 'richtigTanken/basic.html')

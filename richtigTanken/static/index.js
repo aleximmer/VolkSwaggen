@@ -86,7 +86,7 @@ function getUser() {
 }
 
 function sendShit() {
-  $.ajax("/richtigTanken/", {
+  $.ajax("/richtigTanken/newValue/", {
     type: "POST",
     "dataType": "json",
     data: {
