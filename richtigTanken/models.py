@@ -25,6 +25,6 @@ class FahrtDaten(models.Model):
 class UserPositions(models.Model):
 	zeit = models.DateTimeField(auto_now = True)
 	benzin_delta_in_l = models.DecimalField(max_digits = 4, decimal_places = 2)
-	position_x = models.IntegerField()
-	position_y = models.IntegerField()
+	position_x = models.DecimalField(max_digits = 8, decimal_places = 6)
+	position_y = models.DecimalField(max_digits = 8, decimal_places = 6)
 
