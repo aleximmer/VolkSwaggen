@@ -7,6 +7,9 @@ class Tankstellen(models.Model):
 	position_x = models.DecimalField(max_digits = 8, decimal_places = 6)
 	position_y = models.DecimalField(max_digits = 8, decimal_places = 6)
 
+	def __unicode__(self):
+		return self.bezeichnung
+
 # preise werden auch gecrawled (ebenfalls tankstellen-api)
 class BenzinPreis(models.Model):
 	tankstelle = models.ForeignKey(Tankstellen)
