@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 import json
-from models import UserPositions, FahrtDaten
+from models import UserPositions, FahrtDaten, Tankstellen
 import datetime
 import math
 
@@ -50,8 +50,14 @@ def addWaypoint(request):
     neuerWert.save()
     return HttpResponse("OK")
 
-
 def getGasStations(request):
+    #json_text = '{"stations":['
+    #for elem in Tankstellen.objects.all():
+    #    json_text = json_text + '{' + "name:" + elem.bezeichnung + ',' + "lat:" + str(elem.position_x) + ',' + "lng:" + str(elem.position_y) + '},'
+
+    #json_text = json_text + ']}'
+    #print(json_text)
+    #json.loads(json_text)
     stations = {
         'stations': [
             { 'lat': 52.50198, 'lng': 13.409852 },
