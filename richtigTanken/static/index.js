@@ -124,19 +124,19 @@ function changeCircleCount(count) {
 function showOverlay(saving, delay) {
   $("#overlay-euro-value").text(saving);
   $("#overlay-minutes-value").text(delay);
-  $("#overlay").show();
+  $("#overlay").fadeIn();
 }
 
 function hideOverlay() {
-  $("#overlay").hide();
+  $("#overlay").fadeOut();
 }
 
 function showSpinner() {
-  $("#spinner-wrapper").show();
+  $("#spinner-wrapper").fadeIn();
 }
 
 function hideSpinner() {
-  $("#spinner-wrapper").hide();
+  $("#spinner-wrapper").fadeOut();
 }
 
 function getGasStations() {
