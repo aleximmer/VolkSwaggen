@@ -19,7 +19,7 @@ class BenzinPreis(models.Model):
 
 class FahrtDaten(models.Model):
 	nutzer = models.ForeignKey(User)
-	strecken_laengekm = models.DecimalField(max_digits = 4, decimal_places = 1)
+	strecken_laengekm = models.DecimalField(max_digits = 5, decimal_places = 1)
 	spritverbrauch_in_l = models.DecimalField(max_digits = 4, decimal_places = 2)
 	start_zeit = models.DateTimeField()
 	end_zeit = models.DateTimeField()

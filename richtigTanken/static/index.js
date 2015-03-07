@@ -117,3 +117,13 @@ function sendShit() {
     console.log(data);
   })
 }
+
+function endRoute() {
+  $.ajax("/richtigTanken/endRoute/", {
+    type: "POST",
+    dataType: 'text',
+    data: "nothing"
+  }).done(function(data) {
+    console.log(data);
+  })
+}
