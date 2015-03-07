@@ -62,7 +62,21 @@ function changeCircleCount(count) {
 }
 
 function getUser() {
-  $.ajax("localhost:8000/users").done(function(data) {
+  $.ajax("/users").done(function(data) {
     console.log(data);
   });
+}
+
+function sendShit() {
+  $.ajax("/richtigTanken", {
+    type: "POST",
+    data: {
+      position: {
+        lat: 53.2322323,
+        lng: 54.2323423
+      }
+    }
+  }).done(function(data) {
+    console.log(data);
+  })
 }
