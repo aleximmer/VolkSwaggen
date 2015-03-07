@@ -33,3 +33,6 @@ class UserPositionsViewSet(viewsets.ModelViewSet):
 
 def index(request):
     return render(request, 'richtigTanken/index.html')
+
+def addWaypoint(request, x_value, y_value):
+    return render(request, 'richtigTanken/index.html')
