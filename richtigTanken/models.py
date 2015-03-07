@@ -13,6 +13,9 @@ class BenzinPreis(models.Model):
 	preis = models.DecimalField(max_digits = 5, decimal_places = 2)
 	start_zeit = models.DateTimeField()
 
+	class Meta:
+		ordering = ('start_zeit',)
+
 
 class FahrtDaten(models.Model):
 	nutzer = models.ForeignKey(User)
@@ -21,10 +24,16 @@ class FahrtDaten(models.Model):
 	start_zeit = models.DateTimeField()
 	end_zeit = models.DateTimeField()
 
+	class Meta:
+		ordering = ('end_zeit',)
+
 # create user positions for mockup, updated jede minute
 class UserPositions(models.Model):
 	zeit = models.DateTimeField(auto_now = True)
 	benzin_delta_in_l = models.DecimalField(max_digits = 4, decimal_places = 2)
 	position_x = models.DecimalField(max_digits = 8, decimal_places = 6)
 	position_y = models.DecimalField(max_digits = 8, decimal_places = 6)
+
+	class Meta:
+		ordering = ('zeit',)
 

@@ -2,6 +2,9 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from richtigTanken.serializers import UserSerializer, GroupSerializer, FahrtDatenSerializer, UserPositionsSerializer #hieranders
 from models import FahrtDaten, UserPositions
+from django.http import HttpResponse
+from django.template import RequestContext, loader
+from django.shortcuts import render
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -25,3 +28,7 @@ class FahrtDatenViewSet(viewsets.ModelViewSet):
 class UserPositionsViewSet(viewsets.ModelViewSet):
     queryset = UserPositions.objects.all()
     serializer_class = UserPositionsSerializer
+
+
+def index(request):
+    return render(request, 'richtigTanken/index.html')
