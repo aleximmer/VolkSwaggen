@@ -21,21 +21,22 @@
           <div class="col s6 offset-s3">
             <span class="circle green accent-2 waves-effect waves-light z-depth-1" id="notification-circle">
               <div class="circle-text-container">
-                <p class="circle-text" id="circle-message">Du könntest tanken.</p>
-                <p class="circle-text">Du sparst dabei <span id="circle-count">0</span>&euro; !</p>
+                <h5 class="circle-text" id="circle-message">Du könntest tanken.</h5>
+                <p class="circle-text hide" id="richtigesTanken">Du sparst dabei <span id="circle-count">0</span>&euro; !</p>
+                <p class="circle-text" id="keinTanken">Derzeit kein <i>richtiges Tanken</i> </br>möglich.</p>
               </div>
             </span>
+            <div class="valign-wrapper">
+              <span class="circle grey " id="bg-circle"></span>              
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="col s2 offset-s3">
             <span class="btn-floating btn-large waves-effect waves-light green left-align" id="show-more" onclick="showMap();"><i class="mdi-navigation-check"></i></span>
           </div>
-          <div class="col s2">
-            Details anzeigen
-          </div>
-          <div class="col s2">
-            <span class="btn-floating btn-large waves-effect waves-light red right-align" id="abort"><i class="mdi-navigation-close"></i></span>
+          <div class="col s2 offset-s2">
+            <span class="btn-floating btn-large waves-effect waves-light red right-align" id="abort" onclick="reset();"><i class="mdi-navigation-close"></i></span>
           </div>
         </div>
       </div>
@@ -50,7 +51,7 @@
              <div class="card blue-grey darken-1">
                <div class="card-content white-text">
                  <span class="card-title">Neue Route wählen?</span>
-                 <p>Du sparst dabei <span id="overlay-euro-value">2</span>&euro; und hast <span id="overlay-minutes-value">4</span> Minuten Umweg.</p>
+                 <p>Hier kostet der Liter <span id="overlay-euro-value">1,32</span>&euro; und es sind nur <span id="overlay-minutes-value">4</span> Minuten Umweg.</p>
                </div>
                <div class="card-action right-align">
                  <a href="#" onclick="routeToGasStation();">Ja</a>

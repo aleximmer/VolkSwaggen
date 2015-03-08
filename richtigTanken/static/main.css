@@ -11,14 +11,27 @@
   z-index: 500px;
 }
 
+#abort {
+  margin-left:20px;
+}
+
+#bg-circle {
+  height: 680px;
+  width: 740px;
+  /* display: block; */
+  position: absolute;
+  bottom: -450px;
+  right: -70px;
+}
+
 #home {
   margin-top: 20px;
 }
 
 #notification-circle {
-  width: 240px;
+  width: 250px;
   /* padding-bottom: 100%; */
-  height: 240px;
+  height: 250px;
   display: block;
 }
 
@@ -48,7 +61,7 @@
 .spinner-wrapper {
   position: absolute;
   top: 0px;
-  background-color: rgb(120,144,156);
+  background-color: rgba(120,144,156,0.8);
   width: 100%;
   height: 100%;
   z-index: 1001;
@@ -62,5 +75,9 @@
 }
 
 .gm-style-iw img {
+  display: none;
+}
+
+.hide {
   display: none;
 }
