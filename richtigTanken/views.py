@@ -142,6 +142,14 @@ def normalize(vector, user_position):
     vector[1] = vector[1] * norm
     return vector
 
+def get_around_stations():
+    cur = UserPositions.objects.all().order_by['-zeit'][0]
+    stations = Tankstellen.objects.all()
+    for elem in stations:
+        if distance_on_unit_sphere(cur.position_x, cur.position_y, elem.position_x, elem.position_y) > 0.5:
+            stations.remove(elem)
+    return stations
+
 def get_near_stations():
     waypoints = UserPositions.objects.all().order_by['zeit']
     direction = [0.0,0.0]
@@ -151,7 +159,9 @@ def get_near_stations():
         direction[1] = direction[1] + (elem.position_y - cur.position_y)
         cur = elem
     direction = normalize(direction, waypoints[0])
-    direction_rotate = [(direction[1]/2), (-direction[0]/2)]
+    direction_rotate = [direction[1], -direction[0]]
+    
+
     
 
 
