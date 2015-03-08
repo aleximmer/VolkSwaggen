@@ -152,6 +152,8 @@ def get_around_stations():
 
 def get_near_stations(request):
     waypoints = UserPositions.objects.all().order_by['zeit']
+    if not waypoints:
+        return
     direction = [0.0,0.0]
     cur = waypoints[0]
     for elem in waypoints:
