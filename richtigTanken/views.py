@@ -287,7 +287,7 @@ def get_near_stations(request, tankstand):
 
     for elem in stations:
         station = {
-            'name': elem.bezeichnung float(elem.preis),
+            'name': elem.bezeichnung,
             'benzin': "%s" % float(elem.preis),
             'lat': elem.position_x,
             'lng': elem.position_y
