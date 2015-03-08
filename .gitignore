@@ -1,4 +1,6 @@
 *.pyo
 *.pyc
 /*/**.pyc
+db.sqlite3
+backup
 *.sqlite3
