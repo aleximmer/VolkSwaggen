@@ -43,6 +43,8 @@ class BenzinPreisViewSet(viewsets.ModelViewSet):
 def index(request):
     return render(request, 'richtigTanken/index.html')
 
+tankstand = 15
+
 @require_http_methods(["POST"])
 def addWaypoint(request):
     json_data = json.loads(request.body)
@@ -51,7 +53,7 @@ def addWaypoint(request):
     verbrauch = json_data['verbrauch']
     neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
     neuerWert.save()
-    return HttpResponse("OK")
+    return get_near_stations(request, tankstand)
 
 def getAllGasStations(request):
     data = { 'stations': [] }
@@ -157,7 +159,7 @@ def get_around_stations():
     return stations
 
 
-def get_near_stations(request):
+def get_near_stations(request, tankstand):
     waypoints = UserPositions.objects.all().order_by('zeit')
     direction = [0.0,0.0]
     cur = waypoints[0]
@@ -174,7 +176,19 @@ def get_near_stations(request):
         helper = (float(station.position_x) - left_point[0]) / direction_rotate[0]
         if (direction_rotate[1] * helper + left_point[1] < station.position_y):
             stations.remove(station)
-    data = { 'stations': [] }
+
+    stations, max_ersparnis = get_ersparnis(tankstand, stations)
+
+    farbe = 'gelb'
+    if max_ersparnis > 1.50:
+        farbe = 'green'
+    elif max_ersparnis == 0:
+        farbe = 'rot'
+
+    data = { 
+            'ersparnis': max_ersparnis,
+            'farbe': farbe,
+            'stations': [] }
 
     for elem in stations:
         station = {
@@ -186,6 +200,22 @@ def get_near_stations(request):
 
     return JsonResponse(data, safe=False)
 
+def get_ersparnis(tankstand, stations):
+    tankenPreis = get_trends(get_reach(tankstand))
+    # teste trend fuer tankenPreis[0] und vergleiche mit umgebenden tankstellen (aktuelle preise)
+    stations = sorted(stations, key=lambda station: station.preis)[3:]
+    # 60 liter tank
+    tankstand = tankstand / 60
+    tankval = 1.0 - float(tankstand/4)
+    if (stations[0].preis * tankval) > tankenPreis[0]:
+        return [], 0
+    
+    for elem in copy.deepcopy(stations):
+        if (elem.preis * tankval) > tankenPreis[0]:
+            stations.remove(elem)
+
+    max_ersparnis = (tankPreis[0].preis - stations[0].preis) * (60-tankstand)
+    return stations, max_ersparnis
 
 def get_reach(fuel_level):
     average_consumption = get_average_consumption_per_day()
@@ -219,9 +249,7 @@ def average(val1, val2):
 
 
 def get_trends(daysCount):
-    today = datetime.datetime.now().date()
     result = []
-
     year = 2015
     month = 02
     day = 8
