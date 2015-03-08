@@ -50,6 +50,20 @@ def addWaypoint(request):
     neuerWert.save()
     return HttpResponse("OK")
 
+def getAllGasStations(request):
+    data = { 'stations': [] }
+
+    for elem in Tankstellen.objects.all():
+        station = {
+            'name': elem.bezeichnung,
+            'lat': elem.position_x,
+            'lng': elem.position_y
+        }
+        data['stations'].append(station)
+
+    return JsonResponse(data, safe=False)
+
+
 def getGasStations(request):
     #json_text = '{"stations":['
     #for elem in Tankstellen.objects.all():
@@ -58,7 +72,7 @@ def getGasStations(request):
     #json_text = json_text + ']}'
     #print(json_text)
     #json.loads(json_text)
-    stations = {
+    data = {
         'stations': [
             { 'lat': 52.53398, 'lng': 13.409852 },
             { 'lat': 52.50178, 'lng': 13.404832 },
@@ -66,7 +80,7 @@ def getGasStations(request):
             { 'lat': 52.50195, 'lng': 13.406882 },
         ]
     }
-    response = JsonResponse(stations, safe=False)
+    response = JsonResponse(data, safe=False)
     return response
 
 def distance_on_unit_sphere(lat1, long1, lat2, long2):
