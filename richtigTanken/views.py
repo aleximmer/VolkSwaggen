@@ -43,8 +43,8 @@ def index(request):
 @require_http_methods(["POST"])
 def addWaypoint(request):
     json_data = json.loads(request.body)
-    x = json_data['x']
-    y = json_data['y']
+    x = json_data['lat']
+    y = json_data['lng']
     verbrauch = json_data['verbrauch']
     neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
     neuerWert.save()
