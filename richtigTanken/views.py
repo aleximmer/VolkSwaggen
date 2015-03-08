@@ -11,6 +11,7 @@ import json
 from models import UserPositions, FahrtDaten, Tankstellen
 import datetime
 import math
+import copy
 
 
 
@@ -187,3 +188,64 @@ def get_near_stations(request):
         data['stations'].append(station)
 
     return JsonResponse(data, safe=False)
+
+
+def get_reach(fuel_level):
+    average_consumption = get_average_consumption_per_day()
+    lasting_days = 0
+    today = datetime.datetime.now().date()
+    day = today - datetime.timedelta(days=7)
+
+    def get_daily_absolute_consumption(dayy):
+        drives = list(FahrtDaten.objects.all())
+        consumption = 0
+
+        for drive in copy.deepcopy(drives):
+            if drives.start_zeit.date() != dayy:
+                drives.remove(drive)
+
+        for drive in drives:
+            consumption = consumption + drive.spritverbrauch_in_l
+
+        return consumption
+
+    while fuel_level > 0 and day != today:
+        lasting_days = lasting_days + 1
+        fuel_level = fuel_level - average(get_average_daily_consumption(day), average_consumption)
+        day = day + datetime.timedelta(days=1)
+
+    return lasting_days
+
+
+def average(val1, val2):
+    return (val1 + val2) / 2
+
+
+def get_trends(daysCount):
+    today = datetime.datetime.now().date()
+    result = []
+
+    for i in range(0,daysCount):
+        
+
+
+def get_average_consumption_per_track():
+    drives = FahrtDaten.objects.all()
+    consumption = 0
+    track = 0
+
+    for drive in drives:
+        consumption = consumption + drive.spritverbrauch_in_l
+        track = track + drive.streckenlaengekm
+
+    return consumption / track
+
+
+def get_average_consumption_per_day():
+    drives = FahrtDaten.objects.all()
+    consumption = 0
+
+    for drive in drives:
+        consumption = consumption + drive.spritverbrauch_in_l
+
+    return consumption / 14
