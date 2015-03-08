@@ -131,3 +131,40 @@ def endRoute(request):
     print(request.user)
     FahrtDaten.objects.create(nutzer = request.user, strecken_laengekm = distance, spritverbrauch_in_l = verbrauch, start_zeit = positionen[0].zeit, end_zeit = last_zeit).save()
     return HttpResponse("OK")
+
+
+def normalize(vector, user_position):
+    #500m distance to next station
+    distance = 0.5 
+    length_km = distance_on_unit_sphere(user_position.position_x, user_position.position_y, (user_position.position_x+vector[0]), (user_position.position_y+vector[1]))
+    norm = 0.5/length_km
+    vector[0] = vector[0] * norm
+    vector[1] = vector[1] * norm
+    return vector
+
+def get_around_stations():
+    cur = UserPositions.objects.all().order_by['-zeit'][0]
+    stations = Tankstellen.objects.all()
+    for elem in stations:
+        if distance_on_unit_sphere(cur.position_x, cur.position_y, elem.position_x, elem.position_y) > 0.5:
+            stations.remove(elem)
+    return stations
+
+def get_near_stations():
+    waypoints = UserPositions.objects.all().order_by['zeit']
+    direction = [0.0,0.0]
+    cur = waypoints[0]
+    for elem in waypoints:
+        direction[0] = direction[0] + (elem.position_x - cur.position_x)
+        direction[1] = direction[1] + (elem.position_y - cur.position_y)
+        cur = elem
+    direction = normalize(direction, waypoints[0])
+    direction_rotate = [direction[1], -direction[0]]
+    
+
+    
+
+
+
+
+
