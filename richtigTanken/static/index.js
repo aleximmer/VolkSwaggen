@@ -2,11 +2,12 @@ var homeTemplate = $("#homeTemplate").html();
 var mapTemplate = $("#mapTemplate").html();
 
 var mapDfd;
-var stationsDfd;
 var markers = [];
 var currentBestStations = [];
 var currentPosition;
-
+var currentColor;
+var stopped = false;
+var currentData;
 var moving = false;
 var index = 0;
 
@@ -22,6 +23,9 @@ var notificationCircleColor = "green";
 function showHome(data) {
   showTemplate(homeTemplate, data);
   startRoute();
+  if (currentData) {
+    dispatchServerResponse(currentData);
+  }
 }
 
 function showMap(data) {
@@ -66,7 +70,8 @@ function showMap(data) {
 
   new google.maps.Marker({
     position: new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
-    map: map
+    map: map,
+    icon: "http://google.github.io/material-design-icons/maps/svg/ic_directions_car_24px.svg"
   });
 
   mapDfd.done(function(data) {
@@ -75,11 +80,13 @@ function showMap(data) {
       var marker = new google.maps.Marker({
         position: latLng,
         map: map,
-        curser: "pointer"
+        curser: "pointer",
+        icon: "http://google.github.io/material-design-icons/maps/svg/ic_local_gas_station_24px.svg"
       });
       google.maps.event.addListener(marker, 'click', function() {
         selectedStation = station;
-        showOverlay(currentData.ersparnis, getDistance(new google.maps.LatLng(currentPosition.lat, currentPosition.lng), latLng));
+        var money = currentData.ersparnis;
+        showOverlay(money, getDistance(new google.maps.LatLng(currentPosition.lat, currentPosition.lng), latLng));
       });
       var infoWindow = new google.maps.InfoWindow({
         content: station.name
@@ -128,6 +135,7 @@ function dispatchServerResponse(data) {
 }
 
 function changeCircleColor(color) {
+  currentColor = color;
   var colorClass;
   switch (color) {
     case "green":
@@ -177,7 +185,7 @@ function changeCircleCount(count) {
 
 function showOverlay(saving, delay) {
   $("#overlay-euro-value").text(roundThatShit(saving));
-  $("#overlay-minutes-value").text(roundThatShitVöllig((delay / (35 / 3.6))/60));
+  $("#overlay-minutes-value").text(roundThatShitVöllig((delay * 10 / (35 / 3.6))/60));
   $("#overlay").fadeIn();
 }
 
@@ -228,8 +236,12 @@ function sendWaypoint(waypoint) {
 
 function startRoute() {
   moving = true;
+  stopped = false;
 
   function nextWaypoint(index) {
+    if (stopped) {
+      return;
+    }
 
     if (!moving || index >= waypoints.length) {
       return endRoute();
@@ -247,8 +259,14 @@ function startRoute() {
   nextWaypoint(index);
 }
 
-function stopRoute() {
+function reset() {
+  index = 0;
+  stopped = true;
   moving = false;
+}
+
+function stopRoute() {
+  stopped = true;
 }
 
 function endRoute() {
