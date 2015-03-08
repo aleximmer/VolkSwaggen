@@ -79,7 +79,9 @@ function showMap(data) {
       var infoWindow = new google.maps.InfoWindow({
         content: station.name
       });
-      // infoWindow = createInfoBubble(station.name);
+      google.maps.event.addListener(infowindow, 'domready', function(){
+        $(".gm-style-iw").next("div").hide();
+      });
       infoWindow.open(map, marker);
     });
   });
@@ -91,6 +93,27 @@ function showTemplate(template, data) {
 }
 
 showHome({});
+
+function dispatchServerResponse(data) {
+  console.log(data);
+  switch (data.farbe) {
+    case "greenn":
+      changeCircleColor("green");
+      changeCircleMessage("Du könntest tanken.");
+      break;
+    case "gelb":
+      changeCircleColor("yellow");
+      changeCircleMessage("Du solltest bald tanken.");
+      break;
+    case "rot":
+      changeCircleColor("red");
+      changeCircleMessage("Du musst jetzt tanken.");
+      break;
+    default:
+      return new Error("wrong color input.");
+  }
+  changeCircleCount(data.ersparnis);
+}
 
 function changeCircleColor(color) {
   var colorClass;
@@ -120,8 +143,13 @@ function changeCircleMessage(text) {
 }
 
 function changeCircleCount(count) {
+  count = count + "";
+  var countParts= count.split(".");
+  if (countParts[1] && countParts[1].length > 2) {
+    countParts[1] = countParts[1].slice(0,2);
+  }
   var $circleCount = $("#circle-count");
-  $circleCount.text(count);
+  $circleCount.text(countParts.join("."));
 }
 
 function showOverlay(saving, delay) {
@@ -161,25 +189,17 @@ function routeToGasStation() {
 }
 
 function getUser() {
-  $.ajax("/users").done(function(data) {
-    console.log(data);
-  });
+  $.ajax("/users").done(dispatchServerReponse);
 }
 
 function sendWaypoint(waypoint) {
-  // var value = {
-  //       "x": "53.2322323",
-  //       "y": "54.2323423",
-  //       "verbrauch": "0.23"
-  //   }
+
   $.ajax("/richtigTanken/newValue/", {
     type: "POST",
     dataType: 'json',
     contentType: 'application/json, charset=utf-8',
     data: JSON.stringify(waypoint)
-  }).done(function(data) {
-    console.log(data);
-  })
+  }).done(dispatchServerResponse);
 }
 
 var moving;
@@ -203,11 +223,14 @@ function startRoute() {
 }
 
 function endRoute() {
+  if (!moving) {
+    return;
+  }
   moving = false;
   $.post("/richtigTanken/endRoute/", {
     dataType: 'text',
     data: "nothing"
   }).done(function(data) {
-    console.log(data);
+    console.log("end");
   })
 }
