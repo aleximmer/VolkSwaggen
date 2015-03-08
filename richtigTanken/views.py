@@ -155,7 +155,6 @@ def get_ersparnis(tankstand, stations):
     stations = sorted(stations, key=lambda station: station.preis)
     stations = stations[0:3]
     if not stations:
-        print("hier=")
         return [], 0
     # 60 liter tank
     tankstand = tankstand / 60.0
@@ -172,13 +171,10 @@ def get_ersparnis(tankstand, stations):
             stations.remove(elem)
 
     if not stations:
-        print("hier")
         return [], 0
 
-    print("hier2")
     max_ersparnis = (float(tankenPreis[0]) - float(stations[0].preis)) * (60.0-float(tankstand))
-    print(max_ersparnis)
-    print("bis hier?")
+    print("Maximale ersparnis: %s" % max_ersparnis)
     return stations, max_ersparnis
 
 def average(val1, val2):
@@ -273,7 +269,8 @@ def get_near_stations(request, tankstand):
 
     stations, max_ersparnis = get_ersparnis(tankstand, stations)
 
-    max_ersparnis = max_ersparnis + 1
+    if max_ersparnis > 0:
+        max_ersparnis = max_ersparnis + 0.5
     if max_ersparnis < 0:
         max_ersparnis = 0
 
@@ -308,4 +305,6 @@ def addWaypoint(request):
     neuerWert.save()
     global tankstand
     tankstand = float(tankstand) - 0.7
+    if tankstand < 5:
+        tankstand = 20
     return get_near_stations(request, tankstand)
