@@ -8,7 +8,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 import json
-from models import UserPositions, FahrtDaten, Tankstellen
+from models import UserPositions, FahrtDaten, Tankstellen, BenzinPreis
 import datetime
 import math
 import copy
@@ -37,6 +37,8 @@ class UserPositionsViewSet(viewsets.ModelViewSet):
     queryset = UserPositions.objects.all()
     serializer_class = UserPositionsSerializer
 
+class BenzinPreisViewSet(viewsets.ModelViewSet):
+    queryset = BenzinPreis.objects.all()
 
 def index(request):
     return render(request, 'richtigTanken/index.html')
@@ -221,8 +223,21 @@ def get_trends(daysCount):
     today = datetime.datetime.now().date()
     result = []
 
+    year = 2015
+    month = 02
+    day = 8
+    hour = 16
+
     for i in range(0,daysCount):
-        pass
+        date = datetime.datetime(year, month, day + i, hour)
+        tanken = BenzinPreis.objects.all().filter(start_zeit=date)
+
+        tankenPreis = 0
+        for tanke in tanken:
+            tankenPreis = tankenPreis + tanke.preis
+
+        result.append(gesamtPreis / len(tanken))
+    return result
 
 
 def get_average_consumption_per_track():
