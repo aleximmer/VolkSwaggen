@@ -13,7 +13,7 @@ import datetime
 import math
 import copy
 
-
+tankstand = 45.0
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -43,7 +43,7 @@ class BenzinPreisViewSet(viewsets.ModelViewSet):
 def index(request):
     return render(request, 'richtigTanken/index.html')
 
-tankstand = 15
+#tankstand = 50
 
 def getAllGasStations(request):
     data = { 'stations': [] }
@@ -92,13 +92,16 @@ def endRoute(request):
         last_zeit = elem.zeit
     distance = float('%.1f' % distance)
     verbrauch = float('%.2f' % verbrauch)
+    UserPositions.objects.all().delete()
+    global tankstand
+    tankstand = 45.0
     print(distance)
     print(verbrauch)
     print(request.user)
-    FahrtDaten.objects.create(nutzer = request.user, strecken_laengekm = distance, spritverbrauch_in_l = verbrauch, start_zeit = positionen[0].zeit, end_zeit = last_zeit).save()
+    #FahrtDaten.objects.create(nutzer = request.user, strecken_laengekm = distance, spritverbrauch_in_l = verbrauch, start_zeit = positionen[0].zeit, end_zeit = last_zeit).save()
     return HttpResponse("OK")
 
-distance = float(2.0)
+distance = float(0.5)
 def normalize(vector, user_position):
     length_km = distance_on_unit_sphere(float(user_position.position_x), float(user_position.position_y), (float(user_position.position_x)+vector[0]), (float(user_position.position_y)+vector[1]))
     norm = distance/length_km
@@ -109,14 +112,12 @@ def normalize(vector, user_position):
 
 def get_around_stations():
     cur = UserPositions.objects.all().order_by('-zeit')[0]
-    stations = list(Tankstellen.objects.all())
+    stations = list(Tankstellen.objects.all().order_by('preis'))
     stationsSammel = copy.deepcopy(stations)
     for elem in stationsSammel:
         dist = float(distance_on_unit_sphere(float(cur.position_x), float(cur.position_y), float(elem.position_x), float(elem.position_y)))
-        print(dist)
         if dist > distance:
             stations.remove(elem)
-            print(elem.bezeichnung)
     return stations
 
 def distance_on_unit_sphere(lat1, long1, lat2, long2):
@@ -157,8 +158,9 @@ def get_ersparnis(tankstand, stations):
         print("hier=")
         return [], 0
     # 60 liter tank
-    tankstand = tankstand / 60
-    tankval = 1.0 - float(tankstand/2)
+    tankstand = tankstand / 60.0
+    tankval = 1.0 - float(tankstand/2.0)
+    tankstand = tankstand * 60.0
     #print(float(stations[0].preis))
     #print(tankenPreis[0])
     #if (float(stations[0].preis) * float(tankval)) > tankenPreis[0]:
@@ -175,6 +177,7 @@ def get_ersparnis(tankstand, stations):
 
     print("hier2")
     max_ersparnis = (float(tankenPreis[0]) - float(stations[0].preis)) * (60.0-float(tankstand))
+    print(max_ersparnis)
     print("bis hier?")
     return stations, max_ersparnis
 
@@ -207,11 +210,11 @@ def get_reach(fuel_level):
         for drive in drives:
             consumption = consumption + drive.spritverbrauch_in_l
 
-        return consumption
+        return float(consumption)
 
     while fuel_level > 0 and day != today:
         lasting_days = lasting_days + 1
-        fuel_level = fuel_level - average(get_daily_absolute_consumption(day), average_consumption)
+        fuel_level = fuel_level - average(get_daily_absolute_consumption(day), float(average_consumption))
         day = day + datetime.timedelta(days=1)
 
     return lasting_days
@@ -231,8 +234,8 @@ def get_trends(daysCount):
         tankenPreis = 0
         for tanke in tanken:
             tankenPreis = tankenPreis + tanke.preis
-
-        result.append(tankenPreis / len(tanken))
+        if tanken:
+            result.append(tankenPreis / len(tanken))
     return result
 
 
@@ -265,12 +268,19 @@ def get_near_stations(request, tankstand):
         if (direction_rotate[1] * helper + left_point[1] < station.position_y):
             stations.remove(station)
 
+    for station in stations:
+        print(station.bezeichnung)
+
     stations, max_ersparnis = get_ersparnis(tankstand, stations)
 
-    farbe = 'gelb'
-    if max_ersparnis > 7.00:
-        farbe = 'green'
-    elif max_ersparnis == 0:
+    max_ersparnis = max_ersparnis + 1
+    if max_ersparnis < 0:
+        max_ersparnis = 0
+
+    farbe = 'green'
+    if tankstand < 40.0:
+        farbe = 'gelb'
+    if tankstand < 20.0:
         farbe = 'rot'
 
     data = {
@@ -280,7 +290,7 @@ def get_near_stations(request, tankstand):
 
     for elem in stations:
         station = {
-            'name': elem.bezeichnung,
+            'name': elem.bezeichnung + " %s" % float(elem.preis),
             'lat': elem.position_x,
             'lng': elem.position_y
         }
@@ -296,4 +306,6 @@ def addWaypoint(request):
     verbrauch = json_data['verbrauch']
     neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
     neuerWert.save()
+    global tankstand
+    tankstand = float(tankstand) - 0.7
     return get_near_stations(request, tankstand)
