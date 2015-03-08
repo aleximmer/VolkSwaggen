@@ -4,6 +4,7 @@ var mapTemplate = $("#mapTemplate").html();
 var mapDfd;
 var stationsDfd;
 var markers = [];
+var currentBestStations = [];
 
 var position = {
   lat: 52.502230,
@@ -50,7 +51,6 @@ function showMap(data) {
   };
 
   mapDfd = new $.Deferred();
-  stationsDfd = new $.Deferred();
 
   var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
@@ -58,14 +58,8 @@ function showMap(data) {
     mapDfd.resolve();
   });
 
-  // getGasStations();
-
-  $.when(mapDfd, stationsDfd).done(function() {
-    hideSpinner();
-  });
-
-  stationsDfd.done(function(data) {
-    _.each(data.stations, function(station) {
+  mapDfd.done(function(data) {
+    _.each(currentBestStations, function(station) {
       var latLng = new google.maps.LatLng(station.lat, station.lng);
       var marker = new google.maps.Marker({
         position: latLng,
@@ -79,11 +73,12 @@ function showMap(data) {
       var infoWindow = new google.maps.InfoWindow({
         content: station.name
       });
-      google.maps.event.addListener(infowindow, 'domready', function(){
+      google.maps.event.addListener(infoWindow, 'domready', function(){
         $(".gm-style-iw").next("div").hide();
       });
       infoWindow.open(map, marker);
     });
+    hideSpinner();
   });
 }
 
@@ -93,9 +88,10 @@ function showTemplate(template, data) {
 }
 
 showHome({});
+startRoute();
 
 function dispatchServerResponse(data) {
-  console.log(data);
+  currentBestStations = data.stations;
   switch (data.farbe) {
     case "greenn":
       changeCircleColor("green");
