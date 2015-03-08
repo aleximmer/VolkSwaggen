@@ -45,16 +45,6 @@ def index(request):
 
 tankstand = 15
 
-@require_http_methods(["POST"])
-def addWaypoint(request):
-    json_data = json.loads(request.body)
-    x = json_data['lat']
-    y = json_data['lng']
-    verbrauch = json_data['verbrauch']
-    neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
-    neuerWert.save()
-    return get_near_stations(request, tankstand)
-
 def getAllGasStations(request):
     data = { 'stations': [] }
 
@@ -87,35 +77,6 @@ def getGasStations(request):
     }
     response = JsonResponse(data, safe=False)
     return response
-
-def distance_on_unit_sphere(lat1, long1, lat2, long2):
-
-    # Convert latitude and longitude to
-    # spherical coordinates in radians.
-    degrees_to_radians = math.pi/180.0
-
-    # phi = 90 - latitude
-    phi1 = (90.0 - lat1)*degrees_to_radians
-    phi2 = (90.0 - lat2)*degrees_to_radians
-
-    # theta = longitude
-    theta1 = long1*degrees_to_radians
-    theta2 = long2*degrees_to_radians
-
-    # Compute spherical distance from spherical coordinates.
-
-    # For two locations in spherical coordinates
-    # (1, theta, phi) and (1, theta, phi)
-    # cosine( arc length ) =
-    #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
-    # distance = rho * arc length
-
-    cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
-           math.cos(phi1)*math.cos(phi2))
-    arc = math.acos( cos )
-
-    # return in kilometres
-    return (arc * 6371)
 
 @require_http_methods(["POST",])
 def endRoute(request):
@@ -158,6 +119,120 @@ def get_around_stations():
             print(elem.bezeichnung)
     return stations
 
+def distance_on_unit_sphere(lat1, long1, lat2, long2):
+
+    # Convert latitude and longitude to
+    # spherical coordinates in radians.
+    degrees_to_radians = math.pi/180.0
+
+    # phi = 90 - latitude
+    phi1 = (90.0 - lat1)*degrees_to_radians
+    phi2 = (90.0 - lat2)*degrees_to_radians
+
+    # theta = longitude
+    theta1 = long1*degrees_to_radians
+    theta2 = long2*degrees_to_radians
+
+    # Compute spherical distance from spherical coordinates.
+
+    # For two locations in spherical coordinates
+    # (1, theta, phi) and (1, theta, phi)
+    # cosine( arc length ) =
+    #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
+    # distance = rho * arc length
+
+    cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
+           math.cos(phi1)*math.cos(phi2))
+    arc = math.acos( cos )
+
+    # return in kilometres
+    return (arc * 6371)
+
+def get_ersparnis(tankstand, stations):
+    tankenPreis = get_trends(get_reach(tankstand))
+    # teste trend fuer tankenPreis[0] und vergleiche mit umgebenden tankstellen (aktuelle preise)
+    stations = sorted(stations, key=lambda station: station.preis)[3:]
+    # 60 liter tank
+    tankstand = tankstand / 60
+    tankval = 1.0 - float(tankstand/4)
+    if (stations[0].preis * tankval) > tankenPreis[0]:
+        return [], 0
+    
+    for elem in copy.deepcopy(stations):
+        if (elem.preis * tankval) > tankenPreis[0]:
+            stations.remove(elem)
+
+    max_ersparnis = (tankPreis[0].preis - stations[0].preis) * (60-tankstand)
+    return stations, max_ersparnis
+
+def average(val1, val2):
+    return (val1 + val2) / 2
+
+def get_average_consumption_per_day():
+    drives = FahrtDaten.objects.all()
+    consumption = 0
+
+    for drive in drives:
+        consumption = consumption + drive.spritverbrauch_in_l
+
+    return consumption / 14
+
+def get_reach(fuel_level):
+    average_consumption = get_average_consumption_per_day()
+    lasting_days = 0
+    today = datetime.datetime.now().date()
+    day = today - datetime.timedelta(days=7)
+
+    def get_daily_absolute_consumption(dayy):
+        drives = list(FahrtDaten.objects.all())
+        consumption = 0
+
+        for drive in copy.deepcopy(drives):
+            if drives.start_zeit.date() != dayy:
+                drives.remove(drive)
+
+        for drive in drives:
+            consumption = consumption + drive.spritverbrauch_in_l
+
+        return consumption
+
+    while fuel_level > 0 and day != today:
+        lasting_days = lasting_days + 1
+        fuel_level = fuel_level - average(get_daily_absolute_consumption(day), average_consumption)
+        day = day + datetime.timedelta(days=1)
+
+    return lasting_days
+
+
+def get_trends(daysCount):
+    result = []
+    year = 2015
+    month = 02
+    day = 8
+    hour = 16
+
+    for i in range(0,daysCount):
+        date = datetime.datetime(year, month, day + i, hour)
+        tanken = BenzinPreis.objects.all().filter(start_zeit=date)
+
+        tankenPreis = 0
+        for tanke in tanken:
+            tankenPreis = tankenPreis + tanke.preis
+
+        result.append(gesamtPreis / len(tanken))
+    return result
+
+
+def get_average_consumption_per_track():
+    drives = FahrtDaten.objects.all()
+    consumption = 0
+    track = 0
+
+    for drive in drives:
+        consumption = consumption + drive.spritverbrauch_in_l
+        track = track + drive.streckenlaengekm
+
+    return consumption / track
 
 def get_near_stations(request, tankstand):
     waypoints = UserPositions.objects.all().order_by('zeit')
@@ -200,90 +275,14 @@ def get_near_stations(request, tankstand):
 
     return JsonResponse(data, safe=False)
 
-def get_ersparnis(tankstand, stations):
-    tankenPreis = get_trends(get_reach(tankstand))
-    # teste trend fuer tankenPreis[0] und vergleiche mit umgebenden tankstellen (aktuelle preise)
-    stations = sorted(stations, key=lambda station: station.preis)[3:]
-    # 60 liter tank
-    tankstand = tankstand / 60
-    tankval = 1.0 - float(tankstand/4)
-    if (stations[0].preis * tankval) > tankenPreis[0]:
-        return [], 0
-    
-    for elem in copy.deepcopy(stations):
-        if (elem.preis * tankval) > tankenPreis[0]:
-            stations.remove(elem)
-
-    max_ersparnis = (tankPreis[0].preis - stations[0].preis) * (60-tankstand)
-    return stations, max_ersparnis
-
-def get_reach(fuel_level):
-    average_consumption = get_average_consumption_per_day()
-    lasting_days = 0
-    today = datetime.datetime.now().date()
-    day = today - datetime.timedelta(days=7)
-
-    def get_daily_absolute_consumption(dayy):
-        drives = list(FahrtDaten.objects.all())
-        consumption = 0
-
-        for drive in copy.deepcopy(drives):
-            if drives.start_zeit.date() != dayy:
-                drives.remove(drive)
-
-        for drive in drives:
-            consumption = consumption + drive.spritverbrauch_in_l
-
-        return consumption
-
-    while fuel_level > 0 and day != today:
-        lasting_days = lasting_days + 1
-        fuel_level = fuel_level - average(get_average_daily_consumption(day), average_consumption)
-        day = day + datetime.timedelta(days=1)
-
-    return lasting_days
+@require_http_methods(["POST"])
+def addWaypoint(request):
+    json_data = json.loads(request.body)
+    x = json_data['lat']
+    y = json_data['lng']
+    verbrauch = json_data['verbrauch']
+    neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
+    neuerWert.save()
+    return get_near_stations(request, tankstand)
 
 
-def average(val1, val2):
-    return (val1 + val2) / 2
-
-
-def get_trends(daysCount):
-    result = []
-    year = 2015
-    month = 02
-    day = 8
-    hour = 16
-
-    for i in range(0,daysCount):
-        date = datetime.datetime(year, month, day + i, hour)
-        tanken = BenzinPreis.objects.all().filter(start_zeit=date)
-
-        tankenPreis = 0
-        for tanke in tanken:
-            tankenPreis = tankenPreis + tanke.preis
-
-        result.append(gesamtPreis / len(tanken))
-    return result
-
-
-def get_average_consumption_per_track():
-    drives = FahrtDaten.objects.all()
-    consumption = 0
-    track = 0
-
-    for drive in drives:
-        consumption = consumption + drive.spritverbrauch_in_l
-        track = track + drive.streckenlaengekm
-
-    return consumption / track
-
-
-def get_average_consumption_per_day():
-    drives = FahrtDaten.objects.all()
-    consumption = 0
-
-    for drive in drives:
-        consumption = consumption + drive.spritverbrauch_in_l
-
-    return consumption / 14
