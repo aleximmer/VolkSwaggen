@@ -135,7 +135,6 @@ def endRoute(request):
 
 distance = float(0.4)
 def normalize(vector, user_position):
-    #500m distance to next station
     length_km = distance_on_unit_sphere(float(user_position.position_x), float(user_position.position_y), (float(user_position.position_x)+vector[0]), (float(user_position.position_y)+vector[1]))
     norm = distance/length_km
     vector[0] = vector[0] * norm

@@ -16,6 +16,9 @@ class BenzinPreis(models.Model):
 	preis = models.DecimalField(max_digits = 5, decimal_places = 2)
 	start_zeit = models.DateTimeField()
 
+	def __unicode__(self):
+		return(str(self.start_zeit))
+
 	class Meta:
 		ordering = ('start_zeit',)
 
