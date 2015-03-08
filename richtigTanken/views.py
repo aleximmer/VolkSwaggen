@@ -115,7 +115,7 @@ def distance_on_unit_sphere(lat1, long1, lat2, long2):
 
 @require_http_methods(["POST",])
 def endRoute(request):
-    positionen = UserPositions.objects.all().order_by('zeit',)
+    positionen = UserPositions.objects.all().order_by('zeit')
     current_pos = positionen[0]
     distance = 0
     verbrauch = 0
@@ -133,7 +133,7 @@ def endRoute(request):
     FahrtDaten.objects.create(nutzer = request.user, strecken_laengekm = distance, spritverbrauch_in_l = verbrauch, start_zeit = positionen[0].zeit, end_zeit = last_zeit).save()
     return HttpResponse("OK")
 
-distance = 0.2
+distance = float(0.4)
 def normalize(vector, user_position):
     #500m distance to next station
     length_km = distance_on_unit_sphere(float(user_position.position_x), float(user_position.position_y), (float(user_position.position_x)+vector[0]), (float(user_position.position_y)+vector[1]))
@@ -142,23 +142,18 @@ def normalize(vector, user_position):
     vector[1] = vector[1] * norm
     return vector
 
-def get_around_stations(response):
+
+def get_around_stations():
     cur = UserPositions.objects.all().order_by('-zeit')[0]
     stations = list(Tankstellen.objects.all())
-    for elem in stations:
-        if distance_on_unit_sphere(float(cur.position_x), float(cur.position_y), float(elem.position_x), float(elem.position_y)) > distance:
+    stationsSammel = copy.deepcopy(stations)
+    for elem in stationsSammel:
+        dist = float(distance_on_unit_sphere(float(cur.position_x), float(cur.position_y), float(elem.position_x), float(elem.position_y)))
+        print(dist)
+        if dist > distance:
             stations.remove(elem)
-    data = { 'stations': [] }
-
-    for elem in stations:
-        station = {
-            'name': elem.bezeichnung,
-            'lat': elem.position_x,
-            'lng': elem.position_y
-        }
-        data['stations'].append(station)
-
-    return JsonResponse(data, safe=False)
+            print(elem.bezeichnung)
+    return stations
 
 
 def get_near_stations(request):
@@ -173,9 +168,10 @@ def get_near_stations(request):
     direction_rotate = [direction[1], -direction[0]]
     left_point  = [float(cur.position_x) - 0.5 * direction_rotate[0], float(cur.position_y) - 0.5 * direction_rotate[1]]
     stations = get_around_stations()
-    for station in stations:
+    stationsSammel = copy.deepcopy(stations)
+    for station in stationsSammel:
         helper = (float(station.position_x) - left_point[0]) / direction_rotate[0]
-        if (direction_rotate[1] * helper + left_point[1] > station.position_y):
+        if (direction_rotate[1] * helper + left_point[1] < station.position_y):
             stations.remove(station)
     data = { 'stations': [] }
 
