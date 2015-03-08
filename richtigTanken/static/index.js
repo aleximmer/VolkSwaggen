@@ -5,6 +5,10 @@ var mapDfd;
 var stationsDfd;
 var markers = [];
 var currentBestStations = [];
+var currentPosition;
+
+var moving = false;
+var index = 0;
 
 var position = {
   lat: 52.502230,
@@ -17,9 +21,11 @@ var notificationCircleColor = "green";
 
 function showHome(data) {
   showTemplate(homeTemplate, data);
+  startRoute();
 }
 
 function showMap(data) {
+  stopRoute();
   showTemplate(mapTemplate, data);
 
   var mapOptions = {
@@ -58,8 +64,13 @@ function showMap(data) {
     mapDfd.resolve();
   });
 
+  new google.maps.Marker({
+    position: new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
+    map: map
+  });
+
   mapDfd.done(function(data) {
-    _.each(currentBestStations, function(station) {
+    _.each(currentData.stations, function(station) {
       var latLng = new google.maps.LatLng(station.lat, station.lng);
       var marker = new google.maps.Marker({
         position: latLng,
@@ -68,7 +79,7 @@ function showMap(data) {
       });
       google.maps.event.addListener(marker, 'click', function() {
         selectedStation = station;
-        showOverlay(2,2);
+        showOverlay(currentData.ersparnis, getDistance(new google.maps.LatLng(currentPosition.lat, currentPosition.lng), latLng));
       });
       var infoWindow = new google.maps.InfoWindow({
         content: station.name
@@ -88,10 +99,15 @@ function showTemplate(template, data) {
 }
 
 showHome({});
-startRoute();
+
+function getDistance(a, b) {
+  return google.maps.geometry.spherical.computeDistanceBetween(a, b);
+}
+
 
 function dispatchServerResponse(data) {
-  currentBestStations = data.stations;
+  console.log("bam");
+  currentData = data;
   switch (data.farbe) {
     case "greenn":
       changeCircleColor("green");
@@ -138,19 +154,30 @@ function changeCircleMessage(text) {
   $circleMessage.text(text);
 }
 
-function changeCircleCount(count) {
+function roundThatShit(count) {
   count = count + "";
   var countParts= count.split(".");
   if (countParts[1] && countParts[1].length > 2) {
     countParts[1] = countParts[1].slice(0,2);
   }
+  return countParts.join(".")
+}
+
+function roundThatShitVöllig(count) {
+  count = count + "";
+  var countParts = count.split(".");
+  return countParts[0];
+}
+
+function changeCircleCount(count) {
+  count = roundThatShit(count);
   var $circleCount = $("#circle-count");
-  $circleCount.text(countParts.join("."));
+  $circleCount.text(count);
 }
 
 function showOverlay(saving, delay) {
-  $("#overlay-euro-value").text(saving);
-  $("#overlay-minutes-value").text(delay);
+  $("#overlay-euro-value").text(roundThatShit(saving));
+  $("#overlay-minutes-value").text(roundThatShitVöllig((delay / (35 / 3.6))/60));
   $("#overlay").fadeIn();
 }
 
@@ -198,11 +225,9 @@ function sendWaypoint(waypoint) {
   }).done(dispatchServerResponse);
 }
 
-var moving;
+
 function startRoute() {
   moving = true;
-  var index = 0;
-
 
   function nextWaypoint(index) {
 
@@ -211,11 +236,19 @@ function startRoute() {
     }
 
     sendWaypoint(waypoints[index]);
+    currentPosition = {
+      lat: waypoints[index].lat,
+      lng: waypoints[index].lng
+    };
     setTimeout(function() {
       nextWaypoint(index + 1);
     }, 2000);
   }
-  nextWaypoint(0);
+  nextWaypoint(index);
+}
+
+function stopRoute() {
+  moving = false;
 }
 
 function endRoute() {
