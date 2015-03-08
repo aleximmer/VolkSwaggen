@@ -160,8 +160,13 @@ def get_near_stations():
         cur = elem
     direction = normalize(direction, waypoints[0])
     direction_rotate = [direction[1], -direction[0]]
-    
-
+    left_point  = [cur.position_x - 0.5 * direction_rotate[0], cur.position_y - 0.5 * direction_rotate[1]]
+    stations = get_around_stations()
+    for station in stations:
+        helper = (station.position_x - left_point)/ direction_rotate[0]
+        if(direction_rotate[1] * helper + left_point[1] > station.position_y)
+            stations.remove(station) 
+    return stations
     
 
 
