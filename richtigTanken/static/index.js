@@ -58,7 +58,7 @@ function showMap(data) {
     mapDfd.resolve();
   });
 
-  getGasStations();
+  // getGasStations();
 
   $.when(mapDfd, stationsDfd).done(function() {
     hideSpinner();
@@ -85,24 +85,6 @@ function showMap(data) {
   });
 }
 
-function createInfoBubble(content) {
-  return new InfoBubble({
-      map: map,
-      content: '<div class="mylabel">' + content + '</div>',
-      shadowStyle: 1,
-      padding: 0,
-      backgroundColor: 'rgb(57,57,57)',
-      borderRadius: 5,
-      arrowSize: 10,
-      borderWidth: 1,
-      borderColor: '#2c2c2c',
-      disableAutoPan: true,
-      hideCloseButton: true,
-      arrowPosition: 30,
-      backgroundClassName: 'transparent',
-      arrowStyle: 2
-    });
-}
 
 function showTemplate(template, data) {
   $("#content").html(_.template(template, data));

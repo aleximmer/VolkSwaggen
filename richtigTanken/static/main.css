@@ -47,7 +47,7 @@
 .spinner-wrapper {
   position: absolute;
   top: 0px;
-  background-color: rgba(120,144,156,0.8);
+  background-color: rgb(120,144,156);
   width: 100%;
   height: 100%;
   z-index: 1001;
