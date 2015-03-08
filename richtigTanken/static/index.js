@@ -190,7 +190,7 @@ function startRoute() {
 
   function nextWaypoint(index) {
 
-    if (!moving || index >= waypoints.lentgh) {
+    if (!moving || index >= waypoints.length) {
       return endRoute();
     }
 

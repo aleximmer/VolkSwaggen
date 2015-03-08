@@ -6,6 +6,7 @@ class Tankstellen(models.Model):
 	bezeichnung = models.CharField(max_length=256)
 	position_x = models.DecimalField(max_digits = 8, decimal_places = 6)
 	position_y = models.DecimalField(max_digits = 8, decimal_places = 6)
+	preis = models.DecimalField(max_digits = 5, decimal_places = 2)
 
 	def __unicode__(self):
 		return self.bezeichnung
@@ -42,4 +43,3 @@ class UserPositions(models.Model):
 
 	class Meta:
 		ordering = ('zeit',)
-

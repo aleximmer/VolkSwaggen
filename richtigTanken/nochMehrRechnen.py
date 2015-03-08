@@ -19,3 +19,9 @@ def addTanken(start, end):
 		x = random.uniform(-0.15, 0.15)
 		x = float('%.2f' % x)
 		addTankstellendaten(i, x)
+
+def addTankstellenPreis():
+	tanken = Tankstellen.objects.all()
+	for elem in tanken:
+		elem.preis = BenzinPreis.objects.all().filter(tankstelle = elem).order_by('start_zeit')[0].preis
+		elem.save()

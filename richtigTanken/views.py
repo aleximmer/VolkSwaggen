@@ -98,7 +98,7 @@ def endRoute(request):
     FahrtDaten.objects.create(nutzer = request.user, strecken_laengekm = distance, spritverbrauch_in_l = verbrauch, start_zeit = positionen[0].zeit, end_zeit = last_zeit).save()
     return HttpResponse("OK")
 
-distance = float(0.4)
+distance = float(2.0)
 def normalize(vector, user_position):
     length_km = distance_on_unit_sphere(float(user_position.position_x), float(user_position.position_y), (float(user_position.position_x)+vector[0]), (float(user_position.position_y)+vector[1]))
     norm = distance/length_km
@@ -151,18 +151,31 @@ def distance_on_unit_sphere(lat1, long1, lat2, long2):
 def get_ersparnis(tankstand, stations):
     tankenPreis = get_trends(get_reach(tankstand))
     # teste trend fuer tankenPreis[0] und vergleiche mit umgebenden tankstellen (aktuelle preise)
-    stations = sorted(stations, key=lambda station: station.preis)[3:]
+    stations = sorted(stations, key=lambda station: station.preis)
+    stations = stations[0:3]
+    if not stations:
+        print("hier=")
+        return [], 0
     # 60 liter tank
     tankstand = tankstand / 60
-    tankval = 1.0 - float(tankstand/4)
-    if (stations[0].preis * tankval) > tankenPreis[0]:
-        return [], 0
-    
+    tankval = 1.0 - float(tankstand/2)
+    #print(float(stations[0].preis))
+    #print(tankenPreis[0])
+    #if (float(stations[0].preis) * float(tankval)) > tankenPreis[0]:
+#        print("hier null")
+#        return [], 0
+
     for elem in copy.deepcopy(stations):
-        if (elem.preis * tankval) > tankenPreis[0]:
+        if (float(elem.preis) * tankval) > tankenPreis[0]:
             stations.remove(elem)
 
-    max_ersparnis = (tankPreis[0].preis - stations[0].preis) * (60-tankstand)
+    if not stations:
+        print("hier")
+        return [], 0
+
+    print("hier2")
+    max_ersparnis = (float(tankenPreis[0]) - float(stations[0].preis)) * (60.0-float(tankstand))
+    print("bis hier?")
     return stations, max_ersparnis
 
 def average(val1, val2):
@@ -188,7 +201,7 @@ def get_reach(fuel_level):
         consumption = 0
 
         for drive in copy.deepcopy(drives):
-            if drives.start_zeit.date() != dayy:
+            if drive.start_zeit.date() != dayy:
                 drives.remove(drive)
 
         for drive in drives:
@@ -219,7 +232,7 @@ def get_trends(daysCount):
         for tanke in tanken:
             tankenPreis = tankenPreis + tanke.preis
 
-        result.append(gesamtPreis / len(tanken))
+        result.append(tankenPreis / len(tanken))
     return result
 
 
@@ -255,12 +268,12 @@ def get_near_stations(request, tankstand):
     stations, max_ersparnis = get_ersparnis(tankstand, stations)
 
     farbe = 'gelb'
-    if max_ersparnis > 1.50:
+    if max_ersparnis > 7.00:
         farbe = 'green'
     elif max_ersparnis == 0:
         farbe = 'rot'
 
-    data = { 
+    data = {
             'ersparnis': max_ersparnis,
             'farbe': farbe,
             'stations': [] }
@@ -284,5 +297,3 @@ def addWaypoint(request):
     neuerWert = UserPositions.objects.create(zeit = datetime.datetime.now(), benzin_delta_in_l = verbrauch, position_x = x, position_y = y)
     neuerWert.save()
     return get_near_stations(request, tankstand)
-
-
