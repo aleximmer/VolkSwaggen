@@ -306,6 +306,7 @@ def addWaypoint(request):
     neuerWert.save()
     global tankstand
     tankstand = float(tankstand) - 0.7
-    if tankstand < 5:
-        tankstand = 20
+    if tankstand < 5.0:
+        tankstand = 55.0
+    print(tankstand)
     return get_near_stations(request, tankstand)

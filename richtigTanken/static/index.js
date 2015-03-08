@@ -42,6 +42,7 @@ function showMap(data) {
     panControl: false,
     streetViewControl: false,
     zoomControl: false,
+    fitBounds: true,
     styles: [
       {
         'featureType': 'poi',
@@ -83,17 +84,20 @@ function showMap(data) {
         curser: "pointer",
         icon: "http://google.github.io/material-design-icons/maps/svg/ic_local_gas_station_24px.svg"
       });
+
       google.maps.event.addListener(marker, 'click', function() {
         selectedStation = station;
-        var money = currentData.ersparnis;
-        showOverlay(money, getDistance(new google.maps.LatLng(currentPosition.lat, currentPosition.lng), latLng));
+        showOverlay(station.benzin, getDistance(new google.maps.LatLng(currentPosition.lat, currentPosition.lng), latLng));
       });
+
       var infoWindow = new google.maps.InfoWindow({
-        content: station.name
+        content: station.name + " "  + station.benzin + "&euro;"
       });
+
       google.maps.event.addListener(infoWindow, 'domready', function(){
         $(".gm-style-iw").next("div").hide();
       });
+
       infoWindow.open(map, marker);
     });
     hideSpinner();
@@ -116,7 +120,7 @@ function dispatchServerResponse(data) {
   console.log("bam");
   currentData = data;
   switch (data.farbe) {
-    case "greenn":
+    case "green":
       changeCircleColor("green");
       changeCircleMessage("Du könntest tanken.");
       break;
@@ -145,7 +149,7 @@ function changeCircleColor(color) {
       colorClass = "yellow";
       break;
     case "red":
-      colorClass = "red";
+      colorClass = "deep-orange";
       break;
     default:
       return new Error("wrong color input.");
@@ -176,8 +180,21 @@ function roundThatShitVöllig(count) {
   var countParts = count.split(".");
   return countParts[0];
 }
-
+var istNull = true;
 function changeCircleCount(count) {
+  console.log(count);
+  if (count <= 0) {
+    if (!istNull) {
+      istNull = true;
+      $("#richtigesTanken").hide();
+      $("#keinTanken").show();
+    }
+    return;
+  } else if (istNull) {
+    istNull = false;
+    $("#keinTanken").hide();
+    $("#richtigesTanken").show();
+  }
   count = roundThatShit(count);
   var $circleCount = $("#circle-count");
   $circleCount.text(count);
@@ -263,6 +280,7 @@ function reset() {
   index = 0;
   stopped = true;
   moving = false;
+  endRoute();
 }
 
 function stopRoute() {
@@ -270,9 +288,6 @@ function stopRoute() {
 }
 
 function endRoute() {
-  if (!moving) {
-    return;
-  }
   moving = false;
   $.post("/richtigTanken/endRoute/", {
     dataType: 'text',
