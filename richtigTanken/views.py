@@ -222,7 +222,7 @@ def get_trends(daysCount):
     result = []
 
     for i in range(0,daysCount):
-        
+        pass
 
 
 def get_average_consumption_per_track():
