@@ -173,7 +173,7 @@ function sendWaypoint(waypoint) {
     type: "POST",
     dataType: 'json',
     contentType: 'application/json, charset=utf-8',
-    data: JSON.stringify(value)
+    data: JSON.stringify(waypoint)
   }).done(function(data) {
     console.log(data);
   })
@@ -183,6 +183,20 @@ var moving;
 function startRoute() {
   moving = true;
   var index = 0;
+
+
+  function nextWaypoint(index) {
+
+    if (!moving || index >= waypoints.lentgh) {
+      return endRoute();
+    }
+
+    sendWaypoint(waypoints[index]);
+    setTimeout(function() {
+      nextWaypoint(index + 1);
+    }, 5000);
+  }
+  nextWaypoint(0);
 }
 
 function endRoute() {
