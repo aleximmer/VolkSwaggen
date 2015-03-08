@@ -53,3 +53,13 @@
   z-index: 1001;
   display: block;
 }
+
+#back {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+
+.gm-style-iw img {
+  display: none;
+}

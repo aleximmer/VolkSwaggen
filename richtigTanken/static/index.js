@@ -70,17 +70,38 @@ function showMap(data) {
       var marker = new google.maps.Marker({
         position: latLng,
         map: map,
-        curser: "pointer",
-        click: function() {
-          console.log("marker clicked");
-        }
+        curser: "pointer"
       });
       google.maps.event.addListener(marker, 'click', function() {
         selectedStation = station;
         showOverlay(2,2);
       });
+      var infoWindow = new google.maps.InfoWindow({
+        content: station.name
+      });
+      // infoWindow = createInfoBubble(station.name);
+      infoWindow.open(map, marker);
     });
   });
+}
+
+function createInfoBubble(content) {
+  return new InfoBubble({
+      map: map,
+      content: '<div class="mylabel">' + content + '</div>',
+      shadowStyle: 1,
+      padding: 0,
+      backgroundColor: 'rgb(57,57,57)',
+      borderRadius: 5,
+      arrowSize: 10,
+      borderWidth: 1,
+      borderColor: '#2c2c2c',
+      disableAutoPan: true,
+      hideCloseButton: true,
+      arrowPosition: 30,
+      backgroundClassName: 'transparent',
+      arrowStyle: 2
+    });
 }
 
 function showTemplate(template, data) {

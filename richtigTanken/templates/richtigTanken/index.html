@@ -29,19 +29,20 @@
         </div>
         <div class="row">
           <div class="col s2 offset-s3">
-            <span class="btn-floating btn-large waves-effect waves-light green left-align" id="show-more" onclick="showMap();"><i class="mdi-action-done"></i></span>
+            <span class="btn-floating btn-large waves-effect waves-light green left-align" id="show-more" onclick="showMap();"><i class="mdi-navigation-check"></i></span>
           </div>
           <div class="col s2">
             Details anzeigen
           </div>
           <div class="col s2">
-            <span class="btn-floating btn-large waves-effect waves-light red right-align" id="abort"><i class="mdi-content-clear"></i></span>
+            <span class="btn-floating btn-large waves-effect waves-light red right-align" id="abort"><i class="mdi-navigation-close"></i></span>
           </div>
         </div>
       </div>
     </script>
 
     <script type="text/template" id="mapTemplate">
+      <span class="btn-floating btn-large waves-effect waves-light left-align" id="back" onclick="showHome();"><i class="mdi-navigation-arrow-back"></i></span>
       <div id="map"></div>
       <div id="overlay" class="container hide">
         <div class="row">
@@ -80,6 +81,7 @@
     <script type="text/javascript" charset="utf-8" src= "{%static 'bower_components/lodash/lodash.js' %}"></script>
     <script type="text/javascript" charset="utf-8" src= "{%static 'csrfHelper.js' %}"></script>
     <script type="text/javascript" charset="utf-8" src= "{%static 'waypoints.js' %}"></script>
+    <script type="text/javascript" charset="utf-8" src= "{%static 'infoBubble.js' %}"></script>
     <script type="text/javascript" charset="utf-8" src= "{%static 'index.js' %}"></script>
   </body>
 </html>
