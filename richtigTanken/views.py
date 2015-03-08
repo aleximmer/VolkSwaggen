@@ -163,7 +163,7 @@ def get_near_stations(request):
     left_point  = [cur.position_x - 0.5 * direction_rotate[0], cur.position_y - 0.5 * direction_rotate[1]]
     stations = get_around_stations()
     for station in stations:
-        helper = (station.position_x - left_point)/ direction_rotate[0]
+        helper = (station.position_x - left_point) / direction_rotate[0]
         if (direction_rotate[1] * helper + left_point[1] > station.position_y):
             stations.remove(station)
     return stations
