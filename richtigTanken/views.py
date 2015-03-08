@@ -135,7 +135,7 @@ def endRoute(request):
 
 def normalize(vector, user_position):
     #500m distance to next station
-    distance = 0.5 
+    distance = 0.5
     length_km = distance_on_unit_sphere(user_position.position_x, user_position.position_y, (user_position.position_x+vector[0]), (user_position.position_y+vector[1]))
     norm = 0.5/length_km
     vector[0] = vector[0] * norm
@@ -150,7 +150,7 @@ def get_around_stations():
             stations.remove(elem)
     return stations
 
-def get_near_stations():
+def get_near_stations(request):
     waypoints = UserPositions.objects.all().order_by['zeit']
     direction = [0.0,0.0]
     cur = waypoints[0]
@@ -160,11 +160,10 @@ def get_near_stations():
         cur = elem
     direction = normalize(direction, waypoints[0])
     direction_rotate = [direction[1], -direction[0]]
-    
-
-    
-
-
-
-
-
+    left_point  = [cur.position_x - 0.5 * direction_rotate[0], cur.position_y - 0.5 * direction_rotate[1]]
+    stations = get_around_stations()
+    for station in stations:
+        helper = (station.position_x - left_point) / direction_rotate[0]
+        if (direction_rotate[1] * helper + left_point[1] > station.position_y):
+            stations.remove(station)
+    return stations

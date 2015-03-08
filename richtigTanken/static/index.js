@@ -58,7 +58,7 @@ function showMap(data) {
     mapDfd.resolve();
   });
 
-  getAllGasStations();
+  getGasStations();
 
   $.when(mapDfd, stationsDfd).done(function() {
     hideSpinner();
@@ -140,7 +140,7 @@ function hideSpinner() {
 }
 
 function getGasStations() {
-  $.get("/richtigTanken/gasStations").done(function(data) {
+  $.get("/richtigTanken/nearGasStations").done(function(data) {
     stationsDfd.resolve(data);
   });
 }
@@ -194,7 +194,7 @@ function startRoute() {
     sendWaypoint(waypoints[index]);
     setTimeout(function() {
       nextWaypoint(index + 1);
-    }, 5000);
+    }, 2000);
   }
   nextWaypoint(0);
 }
